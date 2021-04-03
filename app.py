@@ -11,7 +11,7 @@ model = pickle.load(open('model.pkl','rb'))
 def home():
     return render_template('index.html')
 @cross_origin()
-@app.route('/predict',methods=['POST'])
+@app.route('/predict',methods=['POST','GET'])
 def predict():
     int_features = [int(x) for x in request.form.values()]
     final_features = [np.array(int_features)]
