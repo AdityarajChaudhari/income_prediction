@@ -1,30 +1,39 @@
-import pandas as pd
+
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 import pickle
 
-data = pd.read_csv(r'D:\Datasets\hiring.csv')
-data.head()
+dataset = pd.read_csv('hiring.csv')
 
-#data.shape
-#data.info()
+dataset['experience'].fillna(0, inplace=True)
 
-data['experience'].fillna(0,inplace=True)
-data['test_score(out of 10)'].fillna(data['test_score(out of 10)'].mean(),inplace=True)
+dataset['test_score'].fillna(dataset['test_score'].mean(), inplace=True)
 
-def convert(word):
-    word_to_num = {'one':1, 'two':2, 'three':3, 'four':4, 'five':5, 'six':6, 'seven':7, 'eight':8,
+X = dataset.iloc[:, :3]
+
+#Converting words to integer values
+def convert_to_int(word):
+    word_dict = {'one':1, 'two':2, 'three':3, 'four':4, 'five':5, 'six':6, 'seven':7, 'eight':8,
                 'nine':9, 'ten':10, 'eleven':11, 'twelve':12, 'zero':0, 0: 0}
-    return word_to_num[word]
-data['experience'] = data['experience'].apply(lambda x : convert(x))
+    return word_dict[word]
 
-x = data.iloc[:,:3]
-y = data.iloc[:,-1]
+X['experience'] = X['experience'].apply(lambda x : convert_to_int(x))
+
+y = dataset.iloc[:, -1]
+
+#Splitting Training and Test Set
+#Since we have a very small dataset, we will train our model with all availabe data.
 
 from sklearn.linear_model import LinearRegression
-lr = LinearRegression()
-lr.fit(x,y)
+regressor = LinearRegression()
 
-pickle.dump(lr,open('model.pkl','wb'))
+#Fitting model with trainig data
+regressor.fit(X, y)
+
+# Saving model to disk
+pickle.dump(regressor, open('model.pkl','wb'))
+
+# Loading model to compare the results
 model = pickle.load(open('model.pkl','rb'))
-print(model.predict([[2,8,5]]))
+print(model.predict([[2, 9, 6]]))
